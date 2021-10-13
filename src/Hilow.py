@@ -13,6 +13,9 @@ class Card:
     def __repr__(self):
         return self.value + ' of ' + self.suit
 
+# Global list to remember drawn cards
+cards = []
+
 def main():
     playGame(createDeck())
 
@@ -25,15 +28,19 @@ def playGame(deck, userInput = 0):
     # Create local variable for each card
     firstCard, secondCard = '???' if userInput == 0 else cards[0], cards[1]
 
-    # Show cards to player
-    system('cls||clear')   # Clear Screen
-    print('King is high || Ace is low\n')
-    print(f'First draw:  {firstCard}')
-    print(f'Second draw: {secondCard}\n')
-
     # User input and game logic
     if userInput == 0: # Phase 1
-        print('Guess if hidden card is higher or lower than shown card')
+        # Shuffle deck and draw first card
+        shuffleDeck(deck)
+        cards.append(drawCards(deck, 1))
+
+        # Show cards to player
+        system('cls||clear')   # Clear Screen
+        print('King is high || Ace is low\n')
+        print(f'First draw:  {cards[0]}')
+
+        # Print user options
+        print('Guess if next card will be higher or lower than shown card.')
         print(' 1. Higher')
         print(' 2. Lower')
 
@@ -49,14 +56,23 @@ def playGame(deck, userInput = 0):
                 exit()
 
     else: # Phase 2
+        # Draw second card
+        cards.append(drawCards(deck, 1))
+
         # Determine if player won the round
         victory = False
         if userInput == 1:
             print('You guessed higher.')
-            victory = True if firstCard.strength > secondCard.strength else False
+            victory = True if cards[0].strength > cards[1].strength else False
         elif userInput == 2:
             print('You guessed lower.')
-            victory = True if firstCard.strength < secondCard.strength else False
+            victory = True if cards[0].strength < cards[1].strength else False
+
+        # Show cards to player
+        system('cls||clear')   # Clear Screen
+        print('King is high || Ace is low\n')
+        print(f'First draw:  {cards[0]}')
+        print(f'Second draw: {cards[1]}\n')
 
         # Print result of round
         print('YOU WIN!\n') if victory else print('YOU LOSE!\n')
@@ -65,7 +81,9 @@ def playGame(deck, userInput = 0):
         # Wait for user input
         while True:
             if is_pressed('enter'):
-                playGame(cards)
+                for card in cards:
+                    deck.append(cards.pop())
+                playGame(deck)
                 break
             elif is_pressed('esc'):
                 exit()

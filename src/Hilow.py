@@ -21,23 +21,16 @@ def main():
 
 # Function which starts the gameplay loop
 def playGame(deck, userInput = 0):
-    # Shuffle deck and draw cards
-    shuffleDeck(deck)
-    cards = drawCards(deck, 2)
-    
-    # Create local variable for each card
-    firstCard, secondCard = '???' if userInput == 0 else cards[0], cards[1]
-
     # User input and game logic
     if userInput == 0: # Phase 1
         # Shuffle deck and draw first card
         shuffleDeck(deck)
-        cards.append(drawCards(deck, 1))
+        cards.append(deck.pop())
 
         # Show cards to player
         system('cls||clear')   # Clear Screen
         print('King is high || Ace is low\n')
-        print(f'First draw:  {cards[0]}')
+        print(f'First card:  {cards[0]}\n')
 
         # Print user options
         print('Guess if next card will be higher or lower than shown card.')
@@ -47,32 +40,32 @@ def playGame(deck, userInput = 0):
         # Wait for user input
         while True:
             if is_pressed('1'):
-                playGame(cards, 1)
+                playGame(deck, 1)
                 break
             elif is_pressed('2'):
-                playGame(cards, 2)
+                playGame(deck, 2)
                 break
             elif is_pressed('esc'):
                 exit()
 
     else: # Phase 2
         # Draw second card
-        cards.append(drawCards(deck, 1))
-
-        # Determine if player won the round
-        victory = False
-        if userInput == 1:
-            print('You guessed higher.')
-            victory = True if cards[0].strength > cards[1].strength else False
-        elif userInput == 2:
-            print('You guessed lower.')
-            victory = True if cards[0].strength < cards[1].strength else False
+        cards.append(deck.pop())
 
         # Show cards to player
         system('cls||clear')   # Clear Screen
         print('King is high || Ace is low\n')
         print(f'First draw:  {cards[0]}')
         print(f'Second draw: {cards[1]}\n')
+
+        # Determine if player won the round
+        victory = False
+        if userInput == 1:
+            print('You guessed higher.')
+            victory = True if cards[0].strength < cards[1].strength else False
+        elif userInput == 2:
+            print('You guessed lower.')
+            victory = True if cards[0].strength > cards[1].strength else False
 
         # Print result of round
         print('YOU WIN!\n') if victory else print('YOU LOSE!\n')
@@ -81,7 +74,7 @@ def playGame(deck, userInput = 0):
         # Wait for user input
         while True:
             if is_pressed('enter'):
-                for card in cards:
+                while cards:
                     deck.append(cards.pop())
                 playGame(deck)
                 break
@@ -120,20 +113,6 @@ def shuffleDeck(deck):
         deck[currentIndex], deck[randomIndex] = deck[randomIndex], deck[currentIndex]
 
     return deck
-
-# Function to draw 'num' of cards
-def drawCards(deck, num):
-    
-    # Draw cards from deck
-    cards = []
-    while num > 0:
-        num -= 1
-        cards.append(deck.pop())
-
-    # Put cards back into deck for next hand
-    deck.extend(cards.copy())
-
-    return cards
 
 if __name__ == '__main__':
     main()
